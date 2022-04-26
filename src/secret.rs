@@ -17,11 +17,14 @@ pub(crate) fn decode(name: &str, namespace: &str, disable_cert_decoding: bool) -
         .register()
         .map_err(|e| anyhow!("{:?}", e))?;
 
-    let secret = get_secret(&connection_config, &req_cfg_id, name, namespace)?.ok_or(anyhow!(
-        "Cannot find secret '{}' inside of namespace '{}'",
-        name,
-        namespace
-    ))?;
+    let secret =
+        get_secret(&connection_config, &req_cfg_id, name, namespace)?.ok_or_else(|| {
+            anyhow!(
+                "Cannot find secret '{}' inside of namespace '{}'",
+                name,
+                namespace
+            )
+        })?;
 
     let mut table = term_table::Table::new();
     table.style = term_table::TableStyle::thin();
@@ -70,7 +73,7 @@ pub(crate) fn decode(name: &str, namespace: &str, disable_cert_decoding: bool) -
     table.add_row(Row::new(vec![
         TableCell::new_with_alignment("Type:", 1, term_table::table_cell::Alignment::Left),
         TableCell::new_with_alignment(
-            secret.type_.unwrap_or("Unknown".to_string()),
+            secret.type_.unwrap_or_else(|| "Unknown".to_string()),
             1,
             term_table::table_cell::Alignment::Left,
         ),
@@ -84,7 +87,7 @@ pub(crate) fn decode(name: &str, namespace: &str, disable_cert_decoding: bool) -
         println!("\n{}:", Blue.bold().paint(key));
 
         let decoded_value_str = String::from_utf8(value.0.clone())
-            .unwrap_or("The base64 decoded value of key '{}' is not UTF-8".to_string());
+            .unwrap_or_else(|_| "The base64 decoded value of key '{}' is not UTF-8".to_string());
 
         if disable_cert_decoding {
             println!("{}", decoded_value_str);

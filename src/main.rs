@@ -30,7 +30,7 @@ fn run(cli: cli::Cli) -> Result<()> {
     let kube_config = Config::load_default().map_err(|e| anyhow!("{:?}", e))?;
     let current_context = kube_config
         .get_current_context()
-        .ok_or(anyhow!("Cannot find default kubeconfig context"))?;
+        .ok_or_else(|| anyhow!("Cannot find default kubeconfig context"))?;
     let default_namespace = current_context
         .namespace
         .clone()
