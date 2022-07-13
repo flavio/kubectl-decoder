@@ -1,5 +1,6 @@
 use clap::{Parser, Subcommand};
 
+/// A Kubectl plugin that interacts with Kubernetes Secret resources
 #[derive(Parser, Debug)]
 #[clap(
     author,
@@ -18,6 +19,7 @@ pub(crate) struct Cli {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum Commands {
+    /// Interact with Kubernetes Secret resources
     #[clap(arg_required_else_help = true)]
     Secret {
         /// If present, the namespace scope for this CLI request
